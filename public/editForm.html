@@ -1,0 +1,73 @@
+<div class="container" id="mainContainer">
+    <div class="main-form" id="divOfProfileEdit">
+        <form id="editProfile-form" onsubmit="editProfileBtn(); return false;" role="form">
+            <h2 align="center">Edit form</h2>
+            <div class="form-group">
+                <input id="form_loginEdit" type="text" class="form-control" maxlength="30" minlength="5" placeholder="Login edit"
+                       required pattern="^[A-Za-z]+[A-Za-z0-9]+$"
+                       title="Must contain one word in the Latin alphabet without spaces, not starting with a number and not less than 5 characters">
+                <div class="errorBlock" id="form_loginErrorEdit">
+                    This login is already registered
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input id="form_emailEdit" type="text" class="form-control" maxlength="40" placeholder="Email edit"
+                       required pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,3}$"
+                       title="The left part indicates the name of the mailbox @ the right part of the address specifies the domain name of the server on which the mailbox is located">
+            </div>
+
+            <div class="form-group">
+                <input id="form_userNameEdit" type="text" class="form-control" maxlength="30" placeholder="Name edit"
+                       title="Enter your name so that we can contact you by name">
+                <div class="errorBlock" id="form_loginErrorAut">
+                    This login is not registered
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input id="form_ageEdit" type="number" class="form-control" min="5" max="150" placeholder="Age edit"
+                       title="Not less than 5 years, no more than 150">
+            </div>
+
+
+            <p>Gender edit:</p>
+            <div align="center">
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id="radioMale" name="radioGender" value="Male" class="custom-control-input" checked>
+                    <label class="custom-control-label" for="radioMale">Male</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id="radioFemale" name="radioGender" value="Female" class="custom-control-input">
+                    <label class="custom-control-label" for="radioFemale">Female</label>
+                </div>
+            </div>
+            <br>
+            <div class="">
+                <input type="submit" id="buttonEditProfile" class="btn btnSubmit btn-send" value="Edit profile">
+            </div>
+            <br>
+        </form>
+
+        <form id="editProfilePassword-form" onsubmit="editProfilePasswordBtn(); return false;" role="form">
+            <div class="form-group">
+                <input id="form_OldPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="Old password"
+                       required oninput="" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                       title="Enter your old password here">
+            </div>
+
+            <div class="form-group">
+                <input id="form_NewPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="New password"
+                       required oninput="passwordCheck('#form_NewPasswordEdit', '#form_confirmNewPasswordEdit', '#buttonEditProfilePassword')" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters">
+            </div>
+            <div class="form-group">
+                <input id="form_confirmNewPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="Confirm new password"
+                       required oninput="passwordCheck('#form_NewPasswordEdit', '#form_confirmNewPasswordEdit', '#buttonEditProfilePassword')" title="Re-enter the new password for confirmation">
+            </div>
+            <div class="">
+                <input type="submit" id="buttonEditProfilePassword" class="btn btnSubmit btn-send" value="Edit password">
+            </div>
+            <br>
+        </form>
+    </div>
+</div>

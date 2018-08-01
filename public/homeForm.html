@@ -1,0 +1,38 @@
+<div class="container" id="mainContainer">
+    <div class="main-form" id="divOfHome">
+        <h2 align="center">Edit home</h2>
+        <div class="dropdown">
+            <button  class="btn btnSubmit dropdown-toggle" id="homeDropdownBtn" data-toggle="dropdown"
+                     title="Choose the house you want to rename">----</button>
+            <ul class="dropdown-menu" aria-labelledby="homeDropdownBtn" role="menu" id="forItems">
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <input id="form_homeEdit" type="text" class="form-control" maxlength="30" placeholder="Enter the home name"
+                   title="Enter the new home name in this field" oninput="updCheck(oldHomeName, VT.getValue('#form_homeEdit'), '#saveBtn')">
+        </div>
+        <div class="">
+            <input type="button" id="saveBtn" class="btn btnSubmit btn-send" value="Save home"
+                   onclick="saveNewName()">
+        </div>
+        <br>
+        <h2 align="center">Edit room</h2>
+        <div class="dropdown">
+            <button  class="btn btnSubmit dropdown-toggle" id="roomDropdownBtn" data-toggle="dropdown"
+                     title="Choose the house you want to rename">----</button>
+            <ul class="dropdown-menu" aria-labelledby="homeDropdownBtn" role="menu" id="forItemsRoom">
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <input id="form_roomEdit" type="text" class="form-control" maxlength="30" placeholder="Enter the room name"
+                   title="Enter the new room name in this field" oninput="updCheck(oldRoomName, VT.getValue('#form_roomEdit'), '#saveBtnRoom')">
+        </div>
+        <div class="">
+            <input type="button" id="saveBtnRoom" class="btn btnSubmit btn-send" value="Save room"
+                   onclick="saveNewNameRoom()">
+        </div>
+        <br>
+    </div>
+</div>
