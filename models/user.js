@@ -15,6 +15,12 @@ var userSchema = new Schema({
 
 userSchema.pre('save', function(next) {
     var user = this;
+
+    var currentDate = new Date();  //add created and updated date
+        user.updated_at = currentDate;
+        if (!user.created_at)
+            user.created_at = currentDate;
+
     // only hash the password if it has been modified (or is new)
     if (!user.isModified('password')) return next();
     
@@ -40,15 +46,6 @@ userSchema.methods.comparePassword = function(candidatePassword, cb) {
     });
 };
         
-// userSchema.pre('save', function (next) {
-//     var currentDate = new Date();
-//     this.updated_at = currentDate;
-//     if (!this.created_at)
-//         this.created_at = currentDate;
-
-//     next();
-// });
-
 var User = mongoose.model('User', userSchema);
 
 module.exports = User;

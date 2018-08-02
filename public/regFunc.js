@@ -72,7 +72,7 @@ authzCheck = () => {
     return VT.isDefined(JSON.parse(localStorage.getItem("loginAut")))
 };
 
-signInBtn = () => {
+function signInBtn() {
     let userAuth = {};
     getUserInfoFromForm(userAuth, ['login', 'password'], 'Aut');
     signInRequest = new XMLHttpRequest();
@@ -83,62 +83,52 @@ signInBtn = () => {
         if (signInRequest.readyState === 4) {
             switch (signInRequest.status) {
                 case 200:
-                remBadForThis(['#form_passwordAut'],['#form_passwordErrorAut']);
-                alert('User Signed in!')
+                    remBadForThis(['#form_passwordAut'], ['#form_passwordErrorAut']);
+                    let res = JSON.parse(signInRequest.response);
+                    localStorage.setItem('token', JSON.stringify(res.token));
+                    alert('User ' + res.login + ' is logged in!');
+                    userStart();
                     break;
                 case 404:
-                addBadForThis(['#form_loginAut'], ['#form_loginErrorAut']);
+                    addBadForThis(['#form_loginAut'], ['#form_loginErrorAut']);
                     break;
                 case 400:
-                addBadForThis(['#form_passwordAut'], ['#form_passwordErrorAut']);
+                    addBadForThis(['#form_passwordAut'], ['#form_passwordErrorAut']);
                     break;
                 default:
-                alert(signInRequest.status + ' server could not find or process data');
-                return;
+                    alert(signInRequest.status + ' server could not find or process data');
+                    return;
             }
-
-            // if (signInRequest.status === 200) {
-            //     return alert('User Signed in!')
-            // }
-            // else {
-            //     if (signInRequest.status === 404) {
-            //         addBadForThis(['#form_loginAut'], ['#form_loginErrorAut']);
-            //         return;
-            //     }
-            //     if (signInRequest.status === 400) {
-            //         addBadForThis(['#form_passwordAut'], ['#form_passwordErrorAut']);
-            //         return;
-            //     }
-            //     if (signInRequest.status === 400) {
-            //         alert(signInRequest.status + ' server could not find or process data');
-            //         return;
-            //     }
-            // }
         }
     }
-
-    // let usersArray = extractFromLS("users");
-    // let searchLogin = VT.getValue('#form_loginAut');
-    // let searchPassword = VT.getValue('#form_passwordAut').hashCode();
-    // for ( let i = 0; i < usersArray.length; i++ ) {
-    //     if ( searchLogin === usersArray[i].login ) {
-    //         if ( searchPassword === usersArray[i].password ) {
-    //             remBadForThis(['#form_passwordAut'],['#form_passwordErrorAut']);
-    //             localStorage.setItem('loginAut', JSON.stringify( usersArray[i].login ));
-    //             loadFile('navBar.html', '#adding', false);
-    //             loadFile('editForm.html', '#underNavBar', false);
-    //             getUserInfoFromLocalStorage(['login', 'email', 'userName', 'age']);
-    //             return;
-    //         }
-    //         else {
-    //             VT.addClass('#form_passwordAut', 'badS');
-    //             VT.getEl('#form_passwordErrorAut').style.display = 'block';
-    //             return;
-    //         }
-    //     }
-    // }
-    // addBadForThis(['#form_loginAut'],['#form_loginErrorAut']);
 };
+
+function userStart() {
+    if (VT.isDefined(localStorage.getItem('token'))) {
+        let token =JSON.parse(localStorage.getItem('token'));
+    //     requestWithPromise('GET', '/user', {token:token})
+    //     .then(function(response){
+    //         loadFile('navBar.html', '#adding', true);
+    //         return
+    //     })
+
+        VT.send('GET', '/user', {token:token}, function(status, data){
+            console.log(status + ' error on send!')
+        }, function(resData){
+            console.log(resData)
+        }, true)
+    }
+}
+
+function requestWithPromise(method, url, param) {
+    return new Promise(function (resolve, reject) {
+        VT.send(method, url, param, function () {
+            reject(new Error("Network Error"));
+        }, function () {
+            resolve(this.response);
+        }, async)
+    });
+}
 
 function signUpBtn() {
     let userObj = {};
@@ -151,7 +141,10 @@ function signUpBtn() {
     regRequest.onreadystatechange = function () {
         if (regRequest.readyState === 4) {
             if (regRequest.status === 200) {
-                return alert('User has been registered!')
+                let res = JSON.parse(regRequest.response);
+                localStorage.setItem('token', JSON.stringify(res.token));
+                alert('User ' + res.login + ' has been registered!');
+                userStart();
             }
             else {
                 if (regRequest.status === 409) {

@@ -280,6 +280,7 @@
         }
 
         function obj_to_query_str(obj) {
+            obj = JSON.parse(obj);
             let str = [];
             for (let p in obj)
                 if (obj.hasOwnProperty(p)) {
