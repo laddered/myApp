@@ -44,10 +44,12 @@ mainNavBarBtn = ()=>{
     if ( VT.getEl('#navBarEdit').disabled === true ) {
         VT.getEl('#navBarEdit').disabled = false;
         VT.getEl('#navBarHome').disabled = true;
-        loadFile('homeForm.html','#underNavBar', false);
-        presettingHomeMenu();
-        populateDropdawnMenu();
-        populateDropdawnMenuRoom();
+        loadWithPromise('homeForm.html','#underNavBar', resData)
+        .then(function(resData){
+            presettingHomeMenu();
+            populateDropdawnMenu();
+            populateDropdawnMenuRoom();
+        })
     }
     else {
         VT.getEl('#navBarEdit').disabled = true;
@@ -56,6 +58,23 @@ mainNavBarBtn = ()=>{
         getUserInfoFromLocalStorage(['login', 'email', 'userName', 'age']);
     }
 };
+
+// mainNavBarBtn = ()=>{
+//     if ( VT.getEl('#navBarEdit').disabled === true ) {
+//         VT.getEl('#navBarEdit').disabled = false;
+//         VT.getEl('#navBarHome').disabled = true;
+//         loadFile('homeForm.html','#underNavBar', false);
+//         presettingHomeMenu();
+//         populateDropdawnMenu();
+//         populateDropdawnMenuRoom();
+//     }
+//     else {
+//         VT.getEl('#navBarEdit').disabled = true;
+//         VT.getEl('#navBarHome').disabled = false;
+//         loadFile('editForm.html', '#underNavBar', false);
+//         getUserInfoFromLocalStorage(['login', 'email', 'userName', 'age']);
+//     }
+// };
 
 populateDropdawnMenu = ()=>{
     for ( let i = 0; i < arrHomes.length; i++ ) {

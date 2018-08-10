@@ -39,7 +39,7 @@ module.exports = function (app, jwt, configWT) {
             if (user !== null) {
                 user.comparePassword(rB.password, function(err, isMatch){
                     if (isMatch) {
-                        console.log('User authorized!');
+                        //User authorized
                         var token = jwt.sign({id:user._id},configWT.secret,{
                             expiresIn: 86400
                         });
@@ -47,7 +47,7 @@ module.exports = function (app, jwt, configWT) {
                         res.send(JSON.stringify({login: rB.login, auth: true, token: token}));
                     }
                     else {
-                        console.log('Invalid user password!');
+                        //Invalid user password
                         res.status(400).send();
                     }
                 });

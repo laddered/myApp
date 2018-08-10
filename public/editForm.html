@@ -52,18 +52,21 @@
 
         <form id="editProfilePassword-form" onsubmit="editProfilePasswordBtn(); return false;" role="form">
             <div class="form-group">
-                <input id="form_OldPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="Old password"
-                       required oninput="" 
+                <input id="form_oldPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="Old password"
+                       required oninput="remBadForThis(['#form_oldPasswordEdit'],['#form_oldPasswordErrorEdit'])"
                        title="Enter your old password here">
+                       <div class="errorBlock" id="form_oldPasswordErrorEdit">
+                        Incorrect password
+                    </div>
             </div>
             <!-- pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" -->
             <div class="form-group">
-                <input id="form_NewPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="New password"
-                       required oninput="passwordCheck('#form_NewPasswordEdit', '#form_confirmNewPasswordEdit', '#buttonEditProfilePassword')" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters">
+                <input id="form_newPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="New password"
+                       required oninput="passwordCheck('#form_newPasswordEdit', '#form_confirmNewPasswordEdit', '#buttonEditProfilePassword')" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters">
             </div>
             <div class="form-group">
                 <input id="form_confirmNewPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="Confirm new password"
-                       required oninput="passwordCheck('#form_NewPasswordEdit', '#form_confirmNewPasswordEdit', '#buttonEditProfilePassword')" title="Re-enter the new password for confirmation">
+                       required oninput="passwordCheck('#form_newPasswordEdit', '#form_confirmNewPasswordEdit', '#buttonEditProfilePassword')" title="Re-enter the new password for confirmation">
             </div>
             <div class="">
                 <input type="submit" id="buttonEditProfilePassword" class="btn btnSubmit btn-send" value="Edit password">

@@ -1,3 +1,22 @@
+function requestWithPromise(method, url, param) {
+    return new Promise(function (resolve, reject) {
+        VT.send(method, url, param, function () {
+            reject(new Error("Network Error"));
+        }, function (resData) {
+            resolve(resData);
+        }, true)
+    });
+}
+
+function loadWithPromise(file, where, resData) {
+    return new Promise(function (resolve, reject) {
+        VT.send("GET", file, {}, function () {
+            reject(new Error("Network Error"));
+        }, function (htmlCode) {
+            resolve({ htmlCode: htmlCode, where: where, resData: resData });
+        }, true)
+    });
+}
 
 loadFile = (file, where, async)=>{
     cleanEl(where);
@@ -67,4 +86,3 @@ getRadioValue = (name)=>{
     }
     return null;
 };
-
