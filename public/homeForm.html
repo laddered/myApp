@@ -3,36 +3,58 @@
         <h2 align="center">Edit home</h2>
         <div class="dropdown">
             <button  class="btn btnSubmit dropdown-toggle" id="homeDropdownBtn" data-toggle="dropdown"
-                     title="Choose the house you want to rename">----</button>
+                     title="Choose the house you want to rename">No homes available</button>
             <ul class="dropdown-menu" aria-labelledby="homeDropdownBtn" role="menu" id="forItems">
             </ul>
         </div>
 
-        <div class="form-group">
             <input id="form_homeEdit" type="text" class="form-control" maxlength="30" placeholder="Enter the home name"
                    title="Enter the new home name in this field" oninput="updCheck(oldHomeName, VT.getValue('#form_homeEdit'), '#saveBtn')">
-        </div>
-        <div class="">
+
+        <div>
             <input type="button" id="saveBtn" class="btn btnSubmit btn-send" value="Save home"
-                   onclick="saveNewName()">
+                   onclick="saveNewName()" style="margin-top: 2em">
         </div>
-        <br>
+
+        <div>
+            <input type="button" id="createHomeBtn" class="btn btnSubmit btn-send" value="Create home +"
+                   onclick="createHomeBtn()" style="margin-top: 2em">
+        </div>
+
+        <div>
+            <input type="button" id="deleteHomeBtn" class="btn btnSubmitWarning btn-send" value="Delete home -"
+                   onclick="deleteHomeBtn()">
+        </div>
+
+        <div id="allForRoom">
+
         <h2 align="center">Edit room</h2>
         <div class="dropdown">
             <button  class="btn btnSubmit dropdown-toggle" id="roomDropdownBtn" data-toggle="dropdown"
-                     title="Choose the house you want to rename">----</button>
+                     title="Choose the house you want to rename">No rooms available</button>
             <ul class="dropdown-menu" aria-labelledby="homeDropdownBtn" role="menu" id="forItemsRoom">
             </ul>
         </div>
 
-        <div class="form-group">
             <input id="form_roomEdit" type="text" class="form-control" maxlength="30" placeholder="Enter the room name"
-                   title="Enter the new room name in this field" oninput="updCheck(oldRoomName, VT.getValue('#form_roomEdit'), '#saveBtnRoom')">
-        </div>
-        <div class="">
+                   title="Enter the new room name in this field" 
+                   oninput="updCheck(oldRoomName, VT.getValue('#form_roomEdit'), '#saveBtnRoom')">
+        <div>
             <input type="button" id="saveBtnRoom" class="btn btnSubmit btn-send" value="Save room"
-                   onclick="saveNewNameRoom()">
+                   onclick="saveNewNameRoom()" style="margin-top: 2em;">
         </div>
-        <br>
+
+        <div>
+            <input type="button" id="createRoomBtn" class="btn btnSubmit btn-send" value="Create room +"
+                   onclick="createRoomBtn()" style="margin-top: 2em">
+        </div>
+
+        <div>
+            <input type="button" id="deleteRoomBtn" class="btn btnSubmitWarning btn-send" value="Delete room -"
+                   onclick="deleteRoomBtn()" style="margin-bottom: 2em">
+        </div>
+
+        </div>
+
     </div>
 </div>

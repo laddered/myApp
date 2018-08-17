@@ -2,7 +2,7 @@ module.exports = function (app, jwt, configWT) {
 
     function createUser(req, res) {
         var rB = req.body;
-        var User = require('./../models/user')
+        var User = require('./../models/user');
         User.findOne({ login: rB.login }, function (err, user) {
             if (err) return console.error(err);
             if (user === null) {
@@ -63,4 +63,4 @@ module.exports = function (app, jwt, configWT) {
         createUser: createUser,
         signIn: signIn
     }
-}
+};

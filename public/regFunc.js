@@ -40,6 +40,11 @@ bootWithConfig = (configSet, authorized) => {
     }
 };
 
+// navigation = (path, hash)=>{
+//     console.log(path);
+//     console.log(hash);
+// };
+
 navigationFunc = (receivedHash, authorized) => {
     switch (receivedHash) {
         case '#authz':
@@ -98,7 +103,7 @@ function signInBtn() {
         alert('User ' + data.login + ' is logged in!');
         userStart();
     }, true);
-};
+}
 
 function userStart() {
     if (VT.isDefined(localStorage.getItem('token'))) {
@@ -150,14 +155,9 @@ editProfileBtn = () => {
     getUserInfoFromForm(userObj, ['login', 'email', 'userName', 'age'], 'Edit');
     userObj.gender = getRadioValue('radioGender');
     userObj.token = JSON.parse(localStorage.getItem('token'));
-    VT.send('POST', '/user/edit', userObj, function (status, data) {
-        if (status === 409) {
-            console.log("This login is already registered!");
-            return addBadForThis(['#form_loginEdit'], ['#form_loginErrorEdit']);
-        }
-        else {
-            return alert(status + ' server could not find or process data');
-        }
+    VT.send('PUT', '/user', userObj, function (status, data) {
+        if (status === 409) return addBadForThis(['#form_loginEdit'], ['#form_loginErrorEdit']);
+        else return alert(status + data);
     }, function (data) {
         remBadForThis(['#form_loginEdit'], ['#form_loginErrorEdit']);
         alert('User data ' + data[1] + ' have been edited!');
@@ -170,26 +170,35 @@ editProfilePasswordBtn = () => {
     let userObj = {};
     userObj.token = JSON.parse(localStorage.getItem('token'));
     getUserInfoFromForm(userObj, ['oldPassword', 'newPassword'], 'Edit');
-    VT.send('POST', '/user/editpassword', userObj, function(status, data){
-        if (status === 400) {
-            return addBadForThis(['#form_oldPasswordEdit'],['#form_oldPasswordErrorEdit']);
-        }
-    }, function(data){
+    VT.send('PUT', '/user/editpassword', userObj, function (status, data) {
+        if (status === 400) return addBadForThis(['#form_oldPasswordEdit'], ['#form_oldPasswordErrorEdit']);
+    }, function (data) {
         alert('User password ' + data + ' have been edited!');
         VT.setValue('#form_oldPasswordEdit', '');
         VT.setValue('#form_newPasswordEdit', '');
         VT.setValue('#form_confirmNewPasswordEdit', '');
+        removeModal('#modalEditPassword');
     }, true)
 };
+
+function deleteProfileBtn() {
+    let userObj = {};
+    userObj.token = JSON.parse(localStorage.getItem('token'));
+    getUserInfoFromForm(userObj, ['password'], 'DeleteProfile');
+    VT.send('DELETE', '/user', userObj, function (status, data) {
+        if (status === 400) {
+            return addBadForThis(['#form_passwordDeleteProfile'], ['#form_passwordDeleteProfileError']);
+        }
+    }, function (data) {
+        alert('User ' + data + ' was deleted!');
+        logOut()
+    }, true)
+}
 
 logOut = () => {
     cleanEl('#adding');
     localStorage.removeItem('token');
     loadFile('authorizationForm.html', '#adding', true);
-};
-
-extractFromLS = (item) => {
-    return JSON.parse(localStorage.getItem(item))
 };
 
 getUserInfoFromForm = (interimObj, fields, idPart) => {
@@ -202,12 +211,26 @@ getUserInfoFromForm = (interimObj, fields, idPart) => {
 getUserInfoFromResponse = (fields) => {
     for (let i in fields) {
         if (VT.isDefined(VT.getEl('#form_' + i + 'Edit'))) {
-            VT.setValue('#form_' + i + 'Edit', fields[i])
+            VT.setValue('#form_' + i + 'Edit', fields[i]);
             if (fields.gender === 'Female') {
                 VT.getEl('#radioFemale').checked = true;
             }
         }
     }
+};
+
+showModal = (modalId)=>{
+    VT.getEl('#shadow').style.display = 'block';
+    VT.getEl(modalId).style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    VT.getEl('#shadow').onclick = function(){removeModal(modalId)};
+};
+
+removeModal =(modalId)=>{
+    VT.getEl('#shadow').style.display = 'none';
+    VT.getEl(modalId).style.display = 'none';
+    document.body.style.overflow = "auto";
+    return false;
 };
 
 inWhichUser = () => {

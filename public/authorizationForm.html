@@ -3,24 +3,22 @@
     <form id="authorization-form" onsubmit="signInBtn(); return false;" method="post" role="form">
         <h2 align="center">Login form</h2>
         <div class="iconLogo"><i class="fas fa-user-circle fa-10x"></i></div>
-        <div class="form-group">
+
             <input id="form_loginAut" type="text" class="form-control" maxlength="30" minlength="5" placeholder="Login"
                    required title="Enter the login of your account in this field"
                    oninput="remBadForThis(['#form_passwordAut', '#form_loginAut'],['#form_passwordErrorAut', '#form_loginErrorAut'])">
             <div class="errorBlock" id="form_loginErrorAut">
                 This login is not registered
             </div>
-        </div>
-        <div class="form-group">
+
             <input id="form_passwordAut" type="password" class="form-control" maxlength="30" placeholder="Password"
                    required title="Enter the password for your account in this field">
             <div class="errorBlock" id="form_passwordErrorAut">
                 Incorrect password
             </div>
 
-        </div>
         <div class="">
-            <input type="submit" id="buttonSignIn" class="btn btnSubmit btn-send" value="Sign In">
+            <input type="submit" id="buttonSignIn" class="btn btnSubmit btn-send" value="Sign In" style="margin-top: 2em">
         </div>
         <br>
         <div class="row">

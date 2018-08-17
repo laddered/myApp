@@ -4,6 +4,7 @@
 *.[oa]
 *~
 /node_modules
+/.idea
 
 # Compiled source #
 ###################

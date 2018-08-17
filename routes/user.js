@@ -5,8 +5,8 @@ module.exports = function(app){
 
     var userCtrl = require('../controllers/user')(app);
     userRouter.get('/', tokenCheck, userCtrl.loadUser);
-    userRouter.post('/edit', tokenCheck, userCtrl.editUser);
-    userRouter.post('/editpassword', tokenCheck, userCtrl.editUserPassword);
-    // userRouter.delete('/', userCtrl.deleteUser);
+    userRouter.put('/', tokenCheck, userCtrl.editUser);
+    userRouter.put('/editpassword', tokenCheck, userCtrl.editUserPassword);
+    userRouter.delete('/', tokenCheck, userCtrl.deleteUser);
     return userRouter;
 }

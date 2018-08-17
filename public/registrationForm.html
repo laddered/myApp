@@ -2,33 +2,25 @@
 <div class="main-form" id="divOfReg">
     <form id="registration-form" onsubmit="signUpBtn(); return false;">
         <h2 align="center">Sign up form</h2>
-        <div class="form-group">
             <input id="form_login" type="text" class="form-control" maxlength="30" minlength="5" placeholder="Login *"
                    oninput="remBadForThis(['#form_login'],['#form_loginErrorReg'])"
                    
                    title="Must contain one word in the Latin alphabet without spaces, not starting with a number and not less than 5 characters">
-        </div>
         <!-- required pattern="^[A-Za-z]+[A-Za-z0-9]+$" -->
         <div class="errorBlock" id="form_loginErrorReg">
             This login is already registered!
         </div>
 
-        <div class="form-group">
             <input id="form_email" type="text" class="form-control" maxlength="40" placeholder="Mail@example.us *"
                    
                    title="The left part indicates the name of the mailbox @ the right part of the address specifies the domain name of the server on which the mailbox is located">
-        </div>
         <!-- required pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,3}$" -->
         
-        <div class="form-group">
             <input id="form_userName" type="text" class="form-control" maxlength="30" placeholder="Name"
                    title="Enter your name so that we can contact you by name">
-        </div>
 
-        <div class="form-group">
             <input id="form_age" type="number" class="form-control" min="5" max="150" placeholder="Age"
                    title="Not less than 5 years, no more than 150">
-        </div>
 
         <div align="center">
             <div class="custom-control custom-radio custom-control-inline">
@@ -41,30 +33,20 @@
             </div>
         </div>
 
-        <div class="form-group">
             <input id="form_password" type="password" class="form-control" maxlength="30" placeholder="Password *"
                    required oninput="passwordCheck('#form_password','#form_confirmPassword', '#buttonSignUp')" 
                    title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters">
-        </div>
         <!-- pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" -->
-        <div class="form-group">
             <input id="form_confirmPassword" type="password" class="form-control" maxlength="30" placeholder="Confirm password *"
                    required oninput="passwordCheck('#form_password','#form_confirmPassword', '#buttonSignUp')" title="Re-enter the password for confirmation">
-        </div>
-        <!--<input  id="passHide" type="checkbox" onclick='hideClick()'> <span> <label for="passHide"> hide off </label> </span>-->
 
-        <!--<div class="form-group">-->
-        <!--&lt;!&ndash; Replace data-sitekey with your own one, generated at https://www.google.com/recaptcha/admin &ndash;&gt;-->
-        <!--<div class="g-recaptcha" data-sitekey="6LfKURIUAAAAAO50vlwWZkyK_G2ywqE52NU7YO0S"></div>-->
-        <!--</div>-->
         <div class="">
-            <input type="submit" id="buttonSignUp" class="btn btnSubmit btn-send" value="Sign Up">
+            <input type="submit" id="buttonSignUp" class="btn btnSubmit btn-send" value="Sign Up" style="margin-top: 2em">
         </div>
         <br>
         <div class="row">
             <input type="button" id="buttonAcc" class="btnAcc" value="Already have an account!" onclick="loadFile('authorizationForm.html','#adding', true)">
         </div>
-        <br>
     </form>
 </div>
 </div>
