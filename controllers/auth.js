@@ -1,18 +1,19 @@
 module.exports = function (app, jwt, configWT) {
 
+    var User = require('./../models/user');
+
     function createUser(req, res) {
-        var rB = req.body;
-        var User = require('./../models/user');
-        User.findOne({ login: rB.login }, function (err, user) {
+        var param = req.body;
+        User.findOne({ login: param.login }, function (err, user) {
             if (err) return console.error(err);
             if (user === null) {
                 var newUser = User({
-                    userName: rB.userName,
-                    login: rB.login,
-                    password: rB.password,
-                    email: rB.email,
-                    age: rB.age,
-                    gender: rB.gender,
+                    userName: param.userName,
+                    login: param.login,
+                    password: param.password,
+                    email: param.email,
+                    age: param.age,
+                    gender: param.gender,
                 });
                 newUser.save(function (err) {
                     if (err) return console.error(err);
@@ -22,7 +23,7 @@ module.exports = function (app, jwt, configWT) {
                     expiresIn: 86400
                 });
                 res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify({login: rB.login, auth: true, token: token}));
+                res.send(JSON.stringify({login: param.login, auth: true, token: token}));
             }
             else {
                 console.log(res.status + 'Found a match!');
@@ -32,19 +33,18 @@ module.exports = function (app, jwt, configWT) {
     }
 
     function signIn(req, res) {
-        var rB = req.body;
-        var User = require('./../models/user');
-        User.findOne({ login: rB.login }, function (err, user) {
+        var param = req.body;
+        User.findOne({ login: param.login }, function (err, user) {
             if (err) return console.error(err);
             if (user !== null) {
-                user.comparePassword(rB.password, function(err, isMatch){
+                user.comparePassword(param.password, function(err, isMatch){
                     if (isMatch) {
                         //User authorized
                         var token = jwt.sign({id:user._id},configWT.secret,{
                             expiresIn: 86400
                         });
                         res.setHeader('Content-Type', 'application/json');
-                        res.send(JSON.stringify({login: rB.login, auth: true, token: token}));
+                        res.send(JSON.stringify({login: param.login, auth: true, token: token}));
                     }
                     else {
                         //Invalid user password

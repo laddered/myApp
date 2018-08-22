@@ -1,6 +1,6 @@
-var config = {
+let config = {
     homes: {
-        preStartFn: () => { loadFile('navBar.html', '#adding', false); },
+        preStartFn: ()=>{ loadFile('navBar.html', '#adding', false); },
         file: 'homeForm.html',
         where: '#underNavBar',
         async: false,
@@ -8,7 +8,7 @@ var config = {
         failFn: () => { returnToAuthz() }
     },
     edit: {
-        preStartFn: () => { loadFile('navBar.html', '#adding', false); },
+        preStartFn: ()=>{ loadFile('navBar.html', '#adding', false); },
         file: 'editForm.html',
         where: '#underNavBar',
         async: false,
@@ -17,19 +17,19 @@ var config = {
     },
 };
 
-homeStart = () => {
+homeStart = ()=>{
     VT.getEl('#navBarEdit').disabled = false;
     VT.getEl('#navBarHome').disabled = true;
     presettingHomeMenu();
     populateDropdawnMenu();
 };
 
-returnToAuthz = () => {
+returnToAuthz = ()=>{
     alert('You are not authorized!');
     loadFile('authorizationForm.html', '#adding', true);
 };
 
-bootWithConfig = (configSet, authorized) => {
+bootWithConfig = (configSet, authorized)=>{
     if (authorized) {
         configSet.preStartFn();
         loadFile(configSet.file, configSet.where, configSet.async);
@@ -40,12 +40,7 @@ bootWithConfig = (configSet, authorized) => {
     }
 };
 
-// navigation = (path, hash)=>{
-//     console.log(path);
-//     console.log(hash);
-// };
-
-navigationFunc = (receivedHash, authorized) => {
+navigationFunc = (receivedHash, authorized)=>{
     switch (receivedHash) {
         case '#authz':
             loadFile('authorizationForm.html', '#adding', true);
@@ -72,17 +67,20 @@ navigationFunc = (receivedHash, authorized) => {
     }
 };
 
-authzCheck = () => {
-    return VT.isDefined(JSON.parse(localStorage.getItem("loginAut")))
-};
+// authzCheck = () => {
+//     return VT.isDefined(JSON.parse(localStorage.getItem("loginAut")))
+// };
 
-function authzCheckNew() {
+authzCheckNew = ()=>{
     if (VT.isDefined(localStorage.getItem('token'))) {
         userStart()
     }
-}
+    else {
+        loadFile('authorizationForm.html', '#adding', true);
+    }
+};
 
-function signInBtn() {
+signInBtn = ()=>{
     let userAuth = {};
     getUserInfoFromForm(userAuth, ['login', 'password'], 'Aut');
     VT.send('POST', '/auth/signIn', userAuth, function (status, data) {
@@ -103,34 +101,36 @@ function signInBtn() {
         alert('User ' + data.login + ' is logged in!');
         userStart();
     }, true);
-}
+};
 
-function userStart() {
-    if (VT.isDefined(localStorage.getItem('token'))) {
-        let token = JSON.parse(localStorage.getItem('token'));
-
-        requestWithPromise('GET', '/user', { token: token })
-            .then(function (resData) {
-                return loadWithPromise('navBar.html', '#adding', resData);
-            })
-            .then(function (obj) {
-                cleanEl(obj.where);
-                VT.getEl(obj.where).innerHTML = obj.htmlCode;
-                VT.getEl('#userNameNB').firstChild.data = obj.resData.login;
-                return loadWithPromise('editForm.html', '#underNavBar', obj.resData);
-            })
-            .then(function (obj) {
-                cleanEl(obj.where);
-                VT.getEl(obj.where).innerHTML = obj.htmlCode;
-                getUserInfoFromResponse(obj.resData)
-            })
+userStart = ()=>{
+    if( IsJsonString(localStorage.getItem('token')) ){
+        token = JSON.parse(localStorage.getItem('token'));
     }
     else {
-        console.log('Token is not found! Perhaps it was deleted. Log in again!')
+        token = localStorage.getItem('token');
     }
-}
 
-function signUpBtn() {
+    requestWithPromise('GET', '/user', { token: token })
+        .then(function (resData) {
+            return loadWithPromise('navBar.html', '#adding', resData);
+        }, function () {
+            invalidToken()
+        })
+        .then(function (obj) {
+            cleanEl(obj.where);
+            VT.getEl(obj.where).innerHTML = obj.htmlCode;
+            VT.getEl('#userNameNB').firstChild.data = obj.resData.login;
+            return loadWithPromise('editForm.html', '#underNavBar', obj.resData);
+        }, function () {})
+        .then(function (obj) {
+            cleanEl(obj.where);
+            VT.getEl(obj.where).innerHTML = obj.htmlCode;
+            getUserInfoFromResponse(obj.resData)
+        }, function () {})
+};
+
+signUpBtn = ()=>{
     let userObj = {};
     getUserInfoFromForm(userObj, ['login', 'email', 'userName', 'age', 'password']);
     userObj.gender = getRadioValue('radioGender');
@@ -148,9 +148,9 @@ function signUpBtn() {
         alert('User ' + data.login + ' has been registered!');
         userStart();
     }, true)
-}
+};
 
-editProfileBtn = () => {
+editProfileBtn = ()=>{
     let userObj = {};
     getUserInfoFromForm(userObj, ['login', 'email', 'userName', 'age'], 'Edit');
     userObj.gender = getRadioValue('radioGender');
@@ -166,7 +166,7 @@ editProfileBtn = () => {
     }, true)
 };
 
-editProfilePasswordBtn = () => {
+editProfilePasswordBtn = ()=>{
     let userObj = {};
     userObj.token = JSON.parse(localStorage.getItem('token'));
     getUserInfoFromForm(userObj, ['oldPassword', 'newPassword'], 'Edit');
@@ -181,7 +181,7 @@ editProfilePasswordBtn = () => {
     }, true)
 };
 
-function deleteProfileBtn() {
+deleteProfileBtn = ()=>{
     let userObj = {};
     userObj.token = JSON.parse(localStorage.getItem('token'));
     getUserInfoFromForm(userObj, ['password'], 'DeleteProfile');
@@ -193,12 +193,16 @@ function deleteProfileBtn() {
         alert('User ' + data + ' was deleted!');
         logOut()
     }, true)
-}
+};
 
-logOut = () => {
-    cleanEl('#adding');
+logOut = ()=>{
     localStorage.removeItem('token');
     loadFile('authorizationForm.html', '#adding', true);
+};
+
+invalidToken = ()=>{
+    logOut();
+    return alert('The token is not valid. You will be returned to the authorization page!');
 };
 
 getUserInfoFromForm = (interimObj, fields, idPart) => {
@@ -208,7 +212,7 @@ getUserInfoFromForm = (interimObj, fields, idPart) => {
     }
 };
 
-getUserInfoFromResponse = (fields) => {
+getUserInfoFromResponse = (fields)=>{
     for (let i in fields) {
         if (VT.isDefined(VT.getEl('#form_' + i + 'Edit'))) {
             VT.setValue('#form_' + i + 'Edit', fields[i]);
@@ -226,14 +230,14 @@ showModal = (modalId)=>{
     VT.getEl('#shadow').onclick = function(){removeModal(modalId)};
 };
 
-removeModal =(modalId)=>{
+removeModal = (modalId)=>{
     VT.getEl('#shadow').style.display = 'none';
     VT.getEl(modalId).style.display = 'none';
     document.body.style.overflow = "auto";
     return false;
 };
 
-inWhichUser = () => {
+inWhichUser = ()=>{
     let user = JSON.parse(localStorage.getItem("loginAut"));
     let usersArray = JSON.parse(localStorage.getItem("users"));
     for (let i = 0; i < usersArray.length; i++) {

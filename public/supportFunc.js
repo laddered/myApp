@@ -1,7 +1,7 @@
 function requestWithPromise(method, url, param) {
     return new Promise(function (resolve, reject) {
-        VT.send(method, url, param, function () {
-            reject(new Error("Network Error"));
+        VT.send(method, url, param, function (error, resData) {
+            reject(error, resData);
         }, function (resData) {
             resolve(resData);
         }, true)
@@ -10,8 +10,8 @@ function requestWithPromise(method, url, param) {
 
 function loadWithPromise(file, where, resData) {
     return new Promise(function (resolve, reject) {
-        VT.send("GET", file, {}, function () {
-            reject(new Error("Network Error"));
+        VT.send("GET", file, {}, function (error, resData) {
+            reject(error);
         }, function (htmlCode) {
             resolve({ htmlCode: htmlCode, where: where, resData: resData });
         }, true)
@@ -20,8 +20,8 @@ function loadWithPromise(file, where, resData) {
 
 loadFile = (file, where, async)=>{
     cleanEl(where);
-    VT.send("GET", file, {}, function failureSend(code,error){
-        alert(code + error)
+    VT.send("GET", file, '', function failureSend(code,error){
+        console.log(code + error)
     }, function successSend(data){
         VT.getEl(where).innerHTML = data;
     }, async);
@@ -76,6 +76,24 @@ passwordCheck = ( first, second, needToBloc)=>{
         VT.getEl(needToBloc).disabled = false;
         VT.removeClass(first, 'badS'); VT.addClass(first, 'goodS'); setTimeout(function() {VT.removeClass(first, 'goodS')}, 1000);
         VT.removeClass(second, 'badS'); VT.addClass(second, 'goodS'); setTimeout(function() {VT.removeClass(second, 'goodS')}, 1000);
+    }
+};
+
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+getToken = ()=>{
+    if( IsJsonString(localStorage.getItem('token')) ){
+        token = JSON.parse(localStorage.getItem('token'));
+    }
+    else {
+        token = localStorage.getItem('token');
     }
 };
 

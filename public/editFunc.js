@@ -1,24 +1,27 @@
-mainNavBarBtn = () => {
-    token = JSON.parse(localStorage.getItem('token'));
+mainNavBarBtn = ()=>{
+    getToken();
 
     if (VT.getEl('#navBarEdit').disabled === true) {
         VT.getEl('#navBarEdit').disabled = false;
         VT.getEl('#navBarHome').disabled = true;
 
-        loadWithPromise('homeForm.html', '#underNavBar', {token:token})
-            .then(function (obj) {
+        requestWithPromise('GET', '/homes/getHomesArr', {token: token})
+            .then( (resData)=>{
+                return loadWithPromise('homeForm.html', '#underNavBar', resData)
+            }, ()=>{
+                invalidToken()
+            })
+            .then( (obj)=>{
                 cleanEl(obj.where);
                 VT.getEl(obj.where).innerHTML = obj.htmlCode;
-                return requestWithPromise('GET', '/homes/getHomesArr', {token: token})
-            })
-            .then(function (resData) {
-                presettingHomeMenu(resData);
+                presettingHomeMenu(obj.resData);
                 populateDropdawnMenu();
                 return requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id})
-            })
-            .then(function (resDataRoom) {
-                presettingRoomMenu(resDataRoom);
+            }, ()=>{})
+            .then( (resData)=>{
+                presettingRoomMenu(resData);
                 populateDropdawnMenuRoom();
+            }, (error)=>{
             });
     }
     else {
@@ -26,19 +29,22 @@ mainNavBarBtn = () => {
         VT.getEl('#navBarHome').disabled = false;
 
         requestWithPromise('GET', '/user', { token: token })
-            .then(function (resData) {
+            .then( (resData)=>{
                 return loadWithPromise('editForm.html', '#underNavBar', resData);
+            }, ()=>{
+                invalidToken();
+                return Promise.reject();
             })
-            .then(function(obj){
+            .then( (obj)=>{
                 cleanEl(obj.where);
                 VT.getEl(obj.where).innerHTML = obj.htmlCode;
                 getUserInfoFromResponse(obj.resData);
-            })
+            }, ()=>{})
     }
 };
 
-presettingHomeMenu = (resData) => {
-        VT.getEl('#saveBtn').disabled = true;
+presettingHomeMenu = (resData)=>{
+    VT.getEl('#saveBtn').disabled = true;
 
     if (resData && resData.length >= 1) {
 
@@ -47,6 +53,8 @@ presettingHomeMenu = (resData) => {
         VT.getEl('#deleteRoomBtn').disabled = false;
 
         VT.getEl('#form_homeEdit').disabled = false;
+        VT.getEl('#deleteHomeBtn').disabled = false;
+
         arrHomes = resData;
         oldHomeName = arrHomes[arrHomes.length - 1].homeName;
         searchHome_id = arrHomes[arrHomes.length - 1]._id;
@@ -59,19 +67,24 @@ presettingHomeMenu = (resData) => {
         VT.getEl('#createRoomBtn').disabled = true;
         VT.getEl('#deleteRoomBtn').disabled = true;
 
+        VT.getEl('#form_homeEdit').disabled = true;
+        VT.getEl('#deleteHomeBtn').disabled = true;
+
         arrHomes = [];
         searchHome_id = undefined;
         VT.getEl('#homeDropdownBtn').firstChild.data = 'No homes available';
         VT.setValue('#form_homeEdit', '');
-        VT.getEl('#form_homeEdit').disabled = true;
     }
 };
 
-presettingRoomMenu = (resDataRoom) => {
-        VT.getEl('#saveBtnRoom').disabled = true;
+presettingRoomMenu = (resDataRoom)=>{
+    VT.getEl('#saveBtnRoom').disabled = true;
 
     if (resDataRoom && resDataRoom.length >= 1) {
+
         VT.getEl('#form_roomEdit').disabled = false;
+        VT.getEl('#deleteRoomBtn').disabled = false;
+
         arrRooms = resDataRoom;
         oldRoomName = arrRooms[arrRooms.length - 1].roomName;
         searchRoomId = arrRooms[arrRooms.length - 1]._id;
@@ -79,15 +92,18 @@ presettingRoomMenu = (resDataRoom) => {
         VT.setValue('#form_roomEdit', arrRooms[arrRooms.length - 1].roomName);
     }
     else {
+
+        VT.getEl('#form_roomEdit').disabled = true;
+        VT.getEl('#deleteRoomBtn').disabled = true;
+
         arrRooms = [];
         searchRoomId = undefined;
         VT.getEl('#roomDropdownBtn').firstChild.data = 'No rooms available';
         VT.setValue('#form_roomEdit', '');
-        VT.getEl('#form_roomEdit').disabled = true;
     }
 };
 
-populateDropdawnMenu = () => {
+populateDropdawnMenu = ()=>{
     if (arrHomes && arrHomes.length >= 1) {
         for (let i = 0; i < arrHomes.length; i++) {
             VT.addEl('#forItems', `<div class="dropdawnItems" onclick="clickOnItem(\'${arrHomes[i].homeName}\', \'${arrHomes[i]._id}\')" id='${arrHomes[i]._id}'>${arrHomes[i].homeName}</div>`, true);
@@ -95,8 +111,7 @@ populateDropdawnMenu = () => {
     }
 };
 
-populateDropdawnMenuRoom = () => {
-    console.log(arrRooms);
+populateDropdawnMenuRoom = ()=>{
     if (arrRooms && arrRooms.length >= 1) {
         for (let i = 0; i < arrRooms.length; i++) {
             VT.addEl('#forItemsRoom', `<div class="dropdawnItems" onclick="clickOnItemRoom(\'${arrRooms[i].roomName}\', \'${arrRooms[i]._id}\')"  id='${arrRooms[i]._id}'>${arrRooms[i].roomName}</div>`, true);
@@ -104,20 +119,23 @@ populateDropdawnMenuRoom = () => {
     }
 };
 
-clickOnItem = (name, id) => {
+clickOnItem = (name, id)=>{
+    getToken();
     cleanEl('#forItemsRoom');
     searchHome_id = id;
     oldHomeName = name;
     VT.getEl('#homeDropdownBtn').firstChild.data = name;
     VT.setValue('#form_homeEdit', name);
     requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id})
-        .then(function (resData) {
+        .then( (resData)=>{
             presettingRoomMenu(resData);
             populateDropdawnMenuRoom();
-        });
+        }, ()=>{
+            loadFile('authorizationForm.html', '#adding', true);
+        })
 };
 
-clickOnItemRoom = (name, id) => {
+clickOnItemRoom = (name, id)=>{
     searchRoomId = id;
     oldRoomName = name;
     VT.getEl('#roomDropdownBtn').firstChild.data = name;
@@ -125,13 +143,22 @@ clickOnItemRoom = (name, id) => {
     VT.getEl('#saveBtnRoom').disabled = true;
 };
 
-saveNewName = () => {
+saveNewNameHome = ()=>{
     let newName = VT.getValue('#form_homeEdit');
-    requestWithPromise('PUT', '/homes/saveHome',{token:token, newName:newName, homeId:searchHome_id})
-        .then(function () {
+    let userObj = {};
+    getToken();
+    userObj.token = token;
+    userObj.newName = newName;
+    userObj.homeId = searchHome_id;
+
+    requestWithPromise('PUT', '/homes/saveHome', userObj)
+        .then( ()=>{
             return requestWithPromise('GET', '/homes/getHomesArr', {token: token})
+        }, ()=>{
+            invalidToken();
+            return Promise.reject();
         })
-        .then(function (resData) {
+        .then( (resData)=>{
             cleanEl('#forItems');
             VT.getEl('#saveBtn').disabled = true;
             oldHomeName = newName;
@@ -139,16 +166,48 @@ saveNewName = () => {
             VT.getEl('#homeDropdownBtn').firstChild.data = newName;
             populateDropdawnMenu();
             console.log('Home save!');
-        });
+        }, ()=>{});
 };
 
-saveNewNameRoom = () => {
+// saveNewNameHome = ()=>{
+//     let newName = VT.getValue('#form_homeEdit');
+//     getToken();
+//     let userObj = {};
+//     userObj.token = token;
+//     userObj.newName = newName;
+//     userObj.homeId = searchHome_id;
+//
+//     console.log(token);
+//
+//     requestWithPromise('PUT', '/homes/saveHome', userObj)
+//         .then( ()=>{
+//             return requestWithPromise('GET', '/homes/getHomesArr', {token: token})
+//         }, ()=>{
+//             invalidToken();
+//             return Promise.reject();
+//         })
+//         .then( (resData)=>{
+//             cleanEl('#forItems');
+//             VT.getEl('#saveBtn').disabled = true;
+//             oldHomeName = newName;
+//             arrHomes = resData;
+//             VT.getEl('#homeDropdownBtn').firstChild.data = newName;
+//             populateDropdawnMenu();
+//             console.log('Home save!');
+//         }, ()=>{});
+// };
+
+saveNewNameRoom = ()=>{
+    getToken();
     let newName = VT.getValue('#form_roomEdit');
     requestWithPromise('PUT', '/homes/saveRoom',{token:token, newName:newName, roomId:searchRoomId})
-        .then(function () {
+        .then( ()=>{
             return requestWithPromise('GET', '/homes/getRoomsArr', {token: token, homeId:searchHome_id})
+        }, ()=>{
+            invalidToken();
+            return Promise.reject();
         })
-        .then(function (resData) {
+        .then( (resData)=>{
             cleanEl('#forItemsRoom');
             VT.getEl('#saveBtnRoom').disabled = true;
             oldRoomName = newName;
@@ -156,69 +215,101 @@ saveNewNameRoom = () => {
             VT.getEl('#roomDropdownBtn').firstChild.data = newName;
             populateDropdawnMenuRoom();
             console.log('Room save!');
-        })
+        }, ()=>{})
 };
 
-createHomeBtn=()=>{
+createHomeBtn = ()=>{
+    getToken();
     let userObj = {};
-    userObj.token = JSON.parse(localStorage.getItem('token'));
-    VT.send("POST", '/homes/createHome', userObj, (status, data)=>{
-        if (status === 400) return console.log('Something wrong!')
-    }, (data)=>{
-
-        requestWithPromise('GET', '/homes/getHomesArr', {token:token})
-            .then(function (resData) {
-                console.log('Home create!');
+    userObj.token = token;
+    requestWithPromise("POST", '/homes/createHome', userObj)
+        .then( ()=>{
+            console.log('Home create!');
+            return requestWithPromise('GET', '/homes/getHomesArr', {token:token})
+        }, ()=>{
+            invalidToken();
+            return Promise.reject();
+        })
+            .then( (resData)=>{
                 cleanEl('#forItems');
                 presettingHomeMenu(resData);
                 populateDropdawnMenu();
+                return requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id})
+            }, ()=>{
+                return Promise.reject();
             })
-    }, true)
-};
-
-createRoomBtn=()=>{
-    let userObj = {};
-    userObj.token = JSON.parse(localStorage.getItem('token'));
-    userObj.homeId = searchHome_id;
-    VT.send("POST", '/homes/createRoom', userObj, (status, data)=>{
-        if (status === 400) return console.log('Something wrong!')
-    }, (data)=>{
-
-        requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id})
-            .then(function (resData) {
-                console.log('Room create!');
-                cleanEl('#forItemsRoom');
+            .then( (resData)=>{
                 presettingRoomMenu(resData);
-                populateDropdawnMenuRoom();
-            });
-    }, true)
+                populateDropdawnMenuRoom()
+            }, ()=>{})
 };
 
-deleteHomeBtn=()=>{
+createRoomBtn = ()=>{
+    getToken();
     let userObj = {};
     userObj.token = token;
     userObj.homeId = searchHome_id;
-    requestWithPromise('DELETE', '/homes/deleteHome', {token:token, homeId:searchHome_id})
-        .then(()=>{
-            return requestWithPromise('GET', '/homes/getHomesArr', {token:token});
+    requestWithPromise("POST", '/homes/createRoom', userObj)
+        .then( ()=>{
+            console.log('Room create!');
+            return requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id})
+        }, ()=>{
+            invalidToken();
+            return Promise.reject();
         })
-        .then((resData)=>{
+        .then( (resData)=>{
+            cleanEl('#forItemsRoom');
+            presettingRoomMenu(resData);
+            populateDropdawnMenuRoom();
+        }, ()=>{})
+};
+
+deleteHomeBtn = ()=>{
+    getToken();
+    let userObj = {};
+    userObj.token = token;
+    userObj.homeId = searchHome_id;
+    requestWithPromise('DELETE', '/homes/deleteHome', userObj)
+        .then( ()=>{
+            return requestWithPromise('GET', '/homes/getHomesArr', {token:token});
+        }, ()=>{
+            invalidToken();
+            return Promise.reject();
+        })
+        .then( (resData)=>{
             console.log('Home delete!');
             cleanEl('#forItems');
             presettingHomeMenu(resData);
             populateDropdawnMenu();
             return requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id})
+        }, ()=>{
+            return Promise.reject();
         })
-        .then((resDataRoom)=>{
-            presettingRoomMenu(resDataRoom);
+        .then( (resData)=>{
+            cleanEl('#forItemsRoom');
+            presettingRoomMenu(resData);
             populateDropdawnMenuRoom()
-        });
+        }, ()=>{})
 };
 
-deleteRoomBtn=()=>{
+deleteRoomBtn = ()=>{
+    getToken();
     let userObj = {};
     userObj.token = token;
-
+    userObj.roomId = searchRoomId;
+    requestWithPromise('DELETE', '/homes/deleteRoom', userObj)
+        .then( ()=>{
+            return requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id});
+        }, ()=>{
+            invalidToken();
+            return Promise.reject();
+        })
+        .then( (resData)=>{
+            cleanEl('#forItemsRoom');
+            presettingRoomMenu(resData);
+            populateDropdawnMenuRoom()
+        }, ()=>{
+        })
 };
 
 let token;

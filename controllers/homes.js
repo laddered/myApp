@@ -1,12 +1,15 @@
 var homesCtrl = function() {
+
+    let User = require('./../models/user');
+    let Home = require('./../models/home');
+    let Room = require('./../models/room');
+
+
     function loadHomes(req, res) {
         return res.send('Go to homes page');
     }
     function createHome(req, res) {
-        let rB = req.body;
-        let User = require('./../models/user');
-        let Home = require('./../models/home');
-
+        let param = req.body;
         User.findById(req.decodedWT.id, function(err, user){
             if (err) return console.error(err);
             let newHome = Home({
@@ -19,13 +22,11 @@ var homesCtrl = function() {
                 res.send();
             });
         })
-    }
 
+    }
     function createRoom(req, res) {
-        let rB = req.body;
-        let Home = require('./../models/home');
-        let Room = require('./../models/room');
-        Home.findById(rB.homeId, function (err, home) {
+        let param = req.body;
+        Home.findById(param.homeId, function (err, home) {
             if (err) return console.error(err);
             let newRoom = Room({
                 roomName: 'New room',
@@ -37,11 +38,9 @@ var homesCtrl = function() {
                 res.send();
             })
         })
-    }
 
+    }
     function getHomesArr(req, res) {
-        let User = require('./../models/user');
-        let Home = require('./../models/home');
         User.findById(req.decodedWT.id, function(err, user){
             if (err) return console.error(err);
 
@@ -51,41 +50,58 @@ var homesCtrl = function() {
                 console.log('Homes send!')
             })
         })
+
     }
 
     function getRoomsArr(req, res){
-        let rB = req.query;
-        console.log(rB);
-        if (rB.homeId === undefined) {return res.send(JSON.stringify([]))}
-        let Home = require('./../models/home');
-        let Room = require('./../models/room');
-        Home.findById(rB.homeId, function (err, home) {
-            if (err) return console.error(err);
-
-            Room.find({homeId:home._id}, function (err, arrRoom) {
+        let param = req.query;
+        if (param.homeId) {
+            Home.findById(param.homeId, function (err, home) {
                 if (err) return console.error(err);
-                res.send(JSON.stringify(arrRoom));
-                console.log('Rooms send!')
+                Room.find({homeId:home._id}, function (err, arrRoom) {
+                    if (err) return console.error(err);
+                    res.send(JSON.stringify(arrRoom));
+                    console.log('Rooms send!')
+                })
             })
-        })
-    }
+        }
+        else {
+            res.send(JSON.stringify([]))
+        }
 
+    }
     function saveHome(req, res) {
-        let rB = req.body;
-        let Home = require('./../models/home');
-        Home.findByIdAndUpdate(rB.homeId, {
-            $set:{homeName: rB.newName}}, function (err, oldHome) {
+        let param = req.body;
+
+        User.findById(req.decodedWT.id, (err, user)=>{
+            if (err) return console.error(err);
+            Home.findOne({_id:param.homeId})
+
+        });
+
+        Home.findByIdAndUpdate(param.homeId, {
+            $set:{homeName: param.newName}}, function (err, oldHome) {
             if (err) return res.status(400).send();
             console.log('Home save!');
             res.send();
         })
     }
 
+    // function saveHome(req, res) {
+    //     let param = req.body;
+    //     let Home = require('./../models/home');
+    //     Home.findByIdAndUpdate(param.homeId, {
+    //         $set:{homeName: param.newName}}, function (err, oldHome) {
+    //         if (err) return res.status(400).send();
+    //         console.log('Home save!');
+    //         res.send();
+    //     })
+    // }
+
     function saveRoom(req, res) {
-        let rB = req.body;
-        let Room = require('./../models/room');
-        Room.findByIdAndUpdate(rB.roomId, {
-            $set:{roomName: rB.newName}}, function (err, oldRoom) {
+        let param = req.body;
+        Room.findByIdAndUpdate(param.roomId, {
+            $set:{roomName: param.newName}}, function (err, oldRoom) {
             if (err) return res.status(400).send();
             console.log('Room save!');
             res.send();
@@ -93,11 +109,9 @@ var homesCtrl = function() {
     }
 
     function deleteHome(req, res) {
-        let rB = req.body;
-        let Home = require('./../models/home');
-        let Room = require('./../models/room');
-        Room.find({homeId: rB.homeId}).remove().exec();
-        Home.findByIdAndRemove(rB.homeId, function (err, home) {
+        let param = req.body;
+        Room.find({homeId: param.homeId}).remove().exec();
+        Home.findByIdAndRemove(param.homeId, function (err, home) {
             if (err) return res.status(500).send();
             console.log('Home delete!');
             res.send();
@@ -105,10 +119,12 @@ var homesCtrl = function() {
     }
 
     function deleteRoom(req, res) {
-        let rB = req.body;
-        let Room = require('./../models/room');
-
-        return res.send('Room delete!');
+        let param = req.body;
+        Room.findByIdAndRemove(param.roomId, function (err, room) {
+            if (err) return res.status(500).send();
+            console.log('Room delete!');
+            res.send();
+        });
     }
     return {
         loadHomes: loadHomes,
