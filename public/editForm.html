@@ -52,7 +52,6 @@
 </div>
 
 <div id="modalEditPassword" class="modalwin">
-    <h2 align="center">Password edit:</h2>
     <form id="editProfilePassword-form" onsubmit="editProfilePasswordBtn(); return false;" role="form">
         <input id="form_oldPasswordEdit" type="password" class="form-control" maxlength="30" placeholder="Old password"
                required oninput="remBadForThis(['#form_oldPasswordEdit'],['#form_oldPasswordErrorEdit'])">
@@ -74,7 +73,6 @@
 </div>
 
 <div id="modalDeleteAccount" class="modalwin">
-    <h2 align="center">Delete account:</h2>
     <form id="deleteProfile-form" onsubmit="deleteProfileBtn(); return false;" role="form">
         <input id="form_passwordDeleteProfile" type="password" class="form-control" maxlength="30" placeholder="Password"
                required oninput="remBadForThis(['#form_passwordDeleteProfile'],['#form_passwordDeleteProfileError'])"

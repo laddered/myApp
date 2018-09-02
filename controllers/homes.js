@@ -13,7 +13,7 @@ var homesCtrl = function() {
         User.findById(req.decodedWT.id, function(err, user){
             if (err) return console.error(err);
             let newHome = Home({
-                homeName: 'New home',
+                homeName: param.homeName,
                 userId: user.id
             });
             newHome.save(function(err){
@@ -29,7 +29,7 @@ var homesCtrl = function() {
         Home.findById(param.homeId, function (err, home) {
             if (err) return console.error(err);
             let newRoom = Room({
-                roomName: 'New room',
+                roomName: param.roomName,
                 homeId: home.id
             });
             newRoom.save(function (err) {
@@ -70,6 +70,7 @@ var homesCtrl = function() {
         }
 
     }
+
     function saveHome(req, res) {
         let param = req.body;
 

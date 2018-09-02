@@ -9,11 +9,13 @@ function tokenCheck(req, res, next) {
     var configWT = require('././/configWebTokensJSON');
 
     jwt.verify(token, configWT.secret, function (err, decoded) {
-        if (err) return res.status(500).send();
-        req.decodedWT = decoded;
+        if (err) {return res.status(500).send()}
+        else {
+            req.decodedWT = decoded;
+            next()
+        }
     });
 
-    next()
 }
 
 module.exports = tokenCheck

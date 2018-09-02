@@ -131,7 +131,8 @@ clickOnItem = (name, id)=>{
             presettingRoomMenu(resData);
             populateDropdawnMenuRoom();
         }, ()=>{
-            loadFile('authorizationForm.html', '#adding', true);
+            invalidToken();
+            return Promise.reject();
         })
 };
 
@@ -222,9 +223,12 @@ createHomeBtn = ()=>{
     getToken();
     let userObj = {};
     userObj.token = token;
+    userObj.homeName = VT.getValue('#form_newHomeName');
     requestWithPromise("POST", '/homes/createHome', userObj)
         .then( ()=>{
             console.log('Home create!');
+            VT.setValue("#form_newHomeName", "");
+            removeModal('#modalCreateHome');
             return requestWithPromise('GET', '/homes/getHomesArr', {token:token})
         }, ()=>{
             invalidToken();
@@ -248,10 +252,13 @@ createRoomBtn = ()=>{
     getToken();
     let userObj = {};
     userObj.token = token;
+    userObj.roomName = VT.getValue("#form_newRoomName");
     userObj.homeId = searchHome_id;
     requestWithPromise("POST", '/homes/createRoom', userObj)
         .then( ()=>{
             console.log('Room create!');
+            VT.setValue("#form_newRoomName", "");
+            removeModal('#modalCreateRoom');
             return requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id})
         }, ()=>{
             invalidToken();
@@ -262,6 +269,16 @@ createRoomBtn = ()=>{
             presettingRoomMenu(resData);
             populateDropdawnMenuRoom();
         }, ()=>{})
+};
+
+beforeDeleteHome = ()=>{
+    VT.getEl("#forDeleteHome").innerHTML = oldHomeName;
+    showModal('#modalDeleteHome');
+};
+
+beforeDeleteRoom = ()=>{
+    VT.getEl("#forDeleteRoom").innerHTML = oldRoomName;
+    showModal('#modalDeleteRoom');
 };
 
 deleteHomeBtn = ()=>{
@@ -278,6 +295,7 @@ deleteHomeBtn = ()=>{
         })
         .then( (resData)=>{
             console.log('Home delete!');
+            removeModal('#modalDeleteHome');
             cleanEl('#forItems');
             presettingHomeMenu(resData);
             populateDropdawnMenu();
@@ -299,6 +317,8 @@ deleteRoomBtn = ()=>{
     userObj.roomId = searchRoomId;
     requestWithPromise('DELETE', '/homes/deleteRoom', userObj)
         .then( ()=>{
+            console.log('Room delete!');
+            removeModal('#modalDeleteRoom');
             return requestWithPromise('GET', '/homes/getRoomsArr', {token:token, homeId:searchHome_id});
         }, ()=>{
             invalidToken();

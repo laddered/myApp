@@ -202,6 +202,7 @@ logOut = ()=>{
 
 invalidToken = ()=>{
     logOut();
+    VT.getEl('#shadow').style.display = 'none';
     return alert('The token is not valid. You will be returned to the authorization page!');
 };
 
